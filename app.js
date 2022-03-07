@@ -1,8 +1,9 @@
+const cors = require("cors");
 const express = require("express");
 const app = express();
 fetch = require("node-fetch");
+app.use(cors());
 app.get("/searchtext/:searchtext", async (req, res) => {
-  console.log(req);
   await fetch(
     "https://serpapi.com/search.json?q=" +
       req.params.searchtext +
