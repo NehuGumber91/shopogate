@@ -45,7 +45,7 @@ app.get("/walmartsports", async (req, res) => {
         console.log(data["@nextpageuri"]);
         next_url = await (baseurl + data["@nextpageuri"]);
         for (i == 0; i < items.length; i++) {
-          console.log("Catalog Started:" + items[i].CatalogId);
+          console.log("Catalog Started:" + items[i].CatalogItemId);
           var category = items[i].Category;
           var subcat = items[i].SubCategory.split(".");
           var k = 0;
@@ -121,7 +121,7 @@ app.get("/walmartsports", async (req, res) => {
           };
           const prod = Maindb.collection("Products");
           const inserted = await prod.insertOne(sendingdata);
-          console.log("Catalog Finished:" + items[i].CatalogId);
+          console.log("Catalog Finished:" + items[i].CatalogItemId);
         }
       });
     });
