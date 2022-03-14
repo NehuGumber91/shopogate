@@ -253,7 +253,7 @@ app.get("/marks", async (req, res) => {
             Uri: items[i].Uri,
             Tag: [],
           };
-          const prod = Maindb.collection("testProducts");
+          const prod = Maindb.collection("Products");
           const inserted = await prod.insertOne(sendingdata);
           console.log("Ending" + items[i].CatalogItemId);
         }
