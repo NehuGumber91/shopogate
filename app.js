@@ -15,15 +15,15 @@ const client = new MongoClient(
 
 const baseurl = "https://api.impact.com";
 
-app.get("/walmartsports", async (req, res) => {
+app.get("/sportschek", async (req, res) => {
   await client.connect();
   const Maindb = client.db("MainDatabase");
   const db = client.db("Taxonomy");
   var run = 0;
   var next_url =
     baseurl +
-    "/Mediapartners/IRqNxUD5KguY3257508WYgzweAZuY8UPj1/Catalogs/4308/Items?PageSize=400";
-  while (run < 7225) {
+    "/Mediapartners/IRqNxUD5KguY3257508WYgzweAZuY8UPj1/Catalogs/6163/Items?PageSize=400";
+  while (run < 191) {
     console.log(next_url);
     await fetch(next_url, {
       method: "GET",
@@ -45,50 +45,12 @@ app.get("/walmartsports", async (req, res) => {
         console.log(data["@nextpageuri"]);
         next_url = await (baseurl + data["@nextpageuri"]);
         for (i == 0; i < items.length; i++) {
-          console.log("Catalog Started:" + items[i].CatalogItemId);
-          var category = items[i].Category;
-          var subcat = items[i].SubCategory.split(".");
-          var k = 0;
-          var searchcategory = category + " ";
-          for (k == 0; k < subcat.length; k++) {
-            if (
-              subcat[k].toLowerCase().trim() != "home page" &&
-              !subcat[k].toLowerCase().includes("mens") &&
-              !subcat[k].toLowerCase().includes("womens") &&
-              !searchcategory.toLowerCase().includes(subcat[k].toLowerCase())
-            ) {
-              searchcategory += " " + subcat[k];
-            } else if (subcat[k].toLowerCase().includes("-")) {
-              searchcategory += " " + subcat[k].replace("-", "");
-            }
-          }
-
-          var tax_item = await db
-            .collection("taxonomy")
-            .aggregate([
-              {
-                $search: {
-                  index: "default",
-                  text: {
-                    query: searchcategory,
-                    path: {
-                      wildcard: "*",
-                    },
-                  },
-                },
-              },
-              { $limit: 1 },
-            ])
-            .toArray();
-          var categoryid =
-            tax_item.length > 0 && typeof tax_item[0].taxid != "undefined"
-              ? tax_item[0].taxid
-              : "";
+          console.log("Started" + items[i].CatalogItemId);
           let sendingdata = {
             CatalogId: items[i].CatalogId,
             CampaignId: items[i].CampaignId,
             CampaignName: items[i].CampaignName,
-            ShopName: "Walmart",
+            ShopName: "Sport Chek",
             CatalogItemId: items[i].CatalogItemId,
             Name: items[i].Name,
             Description: items[i].Description,
@@ -107,7 +69,7 @@ app.get("/walmartsports", async (req, res) => {
             GtinType: items[i].GtinType,
             Asin: items[i].Asin,
             Mpn: items[i].Mpn,
-            Category: categoryid,
+            Category: items[i].Category,
             Colors: items[i].Colors,
             Material: items[i].Material,
             Size: items[i].Size,
@@ -121,11 +83,12 @@ app.get("/walmartsports", async (req, res) => {
           };
           const prod = Maindb.collection("Products");
           const inserted = await prod.insertOne(sendingdata);
-          console.log("Catalog Finished:" + items[i].CatalogItemId);
+          console.log("Ending" + items[i].CatalogItemId);
         }
       });
     });
     run++;
   }
 });
+
 module.exports = app;
